@@ -29,8 +29,8 @@ app.use(express.json());
 app.use(cors({
   origin: [
     "http://localhost:19006",
-    "exp://192.168.15.29:19000",
-    "http://192.168.15.29:19006"
+    "exp://10.68.55.146:19000",
+    "http://10.68.55.146:19006"
   ],
   credentials: true
 }));
