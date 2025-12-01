@@ -1,10 +1,9 @@
 import express from "express";
 import {
-  criarAluno,
-  listarAlunos,
-  obterAlunoPorId,
-  obterAlunoPorMatricula,
-} from "../controllers/alunoController";
+  cadastrarNota,
+  atualizarNota,
+  listarNotas,
+} from "../controllers/notaController";
 import { autenticarToken, verificarPerfil } from "../middlewares/authMiddleware";
 
 const router = express.Router();
@@ -13,25 +12,19 @@ router.post(
   "/",
   autenticarToken,
   verificarPerfil(["admin", "professor"]),
-  criarAluno
+  cadastrarNota
+);
+router.put(
+  "/:id",
+  autenticarToken,
+  verificarPerfil(["admin", "professor"]),
+  atualizarNota
 );
 router.get(
   "/",
   autenticarToken,
   verificarPerfil(["admin", "professor"]),
-  listarAlunos
-);
-router.get(
-  "/:id",
-  autenticarToken,
-  verificarPerfil(["admin", "professor"]),
-  obterAlunoPorId
-);
-router.get(
-  "/matricula/:matricula",
-  autenticarToken,
-  verificarPerfil(["admin", "professor"]),
-  obterAlunoPorMatricula
+  listarNotas
 );
 
 export default router;
