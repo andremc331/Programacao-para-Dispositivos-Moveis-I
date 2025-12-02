@@ -1,28 +1,29 @@
-import React, { useContext, useState } from "react";
-import { View, Text, StyleSheet, Alert } from "react-native";
-import Input from "../components/Input";
-import Button from "../components/Button";
-import { api } from "../services/api";
-import { AuthContext } from "../contexts/AuthContext";
+import React, { useState } from "react";
+import { View, StyleSheet } from "react-native";
+import { TextInput, Button, Text, Card } from "react-native-paper";
+import api from "../services/api";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import NotificationBanner from "../components/Notification";
 
-export default function LoginScreen() {
-  const { signIn } = useContext(AuthContext);
-  const [email, setEmail] = useState("admin@fatec.br");
-  const [senha, setSenha] = useState("123456");
+export default function LoginScreen({ navigation }: any) {
+  const [email, setEmail] = useState("");
+  const [senha, setSenha] = useState("");
+  const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
 
   const handleLogin = async () => {
-    console.log("➡ Clicou no botão Entrar!");
-    try {
-      setLoading(true);
-      const { data } = await api.post("/auth/login", { email, senha });
-      console.log("Token recebido:", data.token);
+    if (!email || !senha) {
+      setMessage("Preencha todos os campos!");
+      return;
+    }
 
-      await signIn(data.token);
-      console.log("Token salvo no contexto!");
-    } catch (e: any) {
-      console.log("ERRO NO LOGIN:", e);
-      Alert.alert("Erro", e?.response?.data?.message || "Falha no login");
+    setLoading(true);
+    try {
+      const res = await api.post("/auth/login", { email, senha });
+      await AsyncStorage.setItem("token", res.data.token);
+      navigation.replace("Home", { perfil: res.data.perfil });
+    } catch (err) {
+      setMessage("Senha ou E-mail incorretos");
     } finally {
       setLoading(false);
     }
@@ -30,15 +31,93 @@ export default function LoginScreen() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>App Boletim</Text>
-      <Input placeholder="E-mail" value={email} onChangeText={setEmail} autoCapitalize="none" keyboardType="email-address" />
-      <Input placeholder="Senha" value={senha} onChangeText={setSenha} secureTextEntry />
-      <Button title="Entrar" onPress={handleLogin} loading={loading} />
+      <NotificationBanner
+        visible={!!message}
+        message={message}
+        onDismiss={() => setMessage("")}
+      />
+      <Card style={styles.card}>
+        <Card.Title title="Login Acadêmico" titleStyle={styles.title} />
+        <Card.Content>
+          <TextInput
+            label="E-mail"
+            mode="outlined"
+            value={email}
+            onChangeText={setEmail}
+            style={styles.input}
+            autoCapitalize="none"
+            keyboardType="email-address"
+          />
+
+          <TextInput
+            label="Senha"
+            mode="outlined"
+            secureTextEntry
+            value={senha}
+            onChangeText={setSenha}
+            style={styles.input}
+          />
+
+          <Button
+            mode="contained"
+            onPress={handleLogin}
+            loading={loading}
+            style={{ marginTop: 15 }}
+          >
+            Entrar
+          </Button>
+          <Button
+            mode="text"
+            onPress={() => navigation.navigate("CadastroScreen")}
+            style={styles.linkButton}
+          >
+            Não tem conta? Cadastre-se
+          </Button>
+        </Card.Content>
+      </Card>
+      <Text style={styles.footerText}>
+        © 2025 AppScholar — Sistema Acadêmico - André Ventura
+      </Text>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 20, justifyContent: "center" },
-  title: { fontSize: 22, fontWeight: "700", marginBottom: 16, textAlign: "center" },
+  container: {
+    flex: 1,
+    justifyContent: "center",
+    padding: 20,
+    backgroundColor: "#fff",
+  },
+  topBar: {
+    position: "absolute",
+    top: 40,
+    right: 15,
+  },
+  card: {
+    padding: 10,
+    borderRadius: 10,
+  },
+  title: {
+    textAlign: "center",
+    fontSize: 24,
+    fontWeight: "bold",
+  },
+  input: {
+    marginBottom: 10,
+  },
+  footerText: {
+    textAlign: "center",
+    marginTop: 20,
+    color: "#777",
+  },
+  linkButton: {
+    padding: 10,
+    alignItems: "center",
+    marginTop: 20,
+  },
+  linkText: {
+    color: "#007AFF",
+    fontSize: 16,
+  },
 });

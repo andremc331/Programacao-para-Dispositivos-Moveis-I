@@ -1,39 +1,126 @@
-import React, { useContext } from "react";
+import React from "react";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import { createDrawerNavigator } from "@react-navigation/drawer";
-
+import { NavigationContainer } from "@react-navigation/native";
 import LoginScreen from "../screens/LoginScreen";
 import HomeScreen from "../screens/HomeScreen";
-import CadastroAlunoScreen from "../screens/CadastroAlunoScreen";
-import CadastroDisciplinaScreen from "../screens/CadastroDisciplinaScreen";
+import AlunoScreen from "../screens/AlunoScreen";
+import ProfessorScreen from "../screens/ProfessorScreen";
+import DisciplinaScreen from "../screens/DisciplinaScreen";
 import BoletimScreen from "../screens/BoletimScreen";
-
-import { AuthContext } from "../contexts/AuthContext";
+import ProtectedRoute from "../components/ProtectedRoute";
+import CadastroScreen from "../screens/CadastroScreen";
+import ListaAlunosScreen from "../screens/ListaAlunoScreen";
+import ListaProfessoresScreen from "../screens/ListaProfessorScreen";
+import ListaDisciplinasScreen from "../screens/ListaDisciplinaScreen";
+import LancarNotasScreen from "../screens/NotaScreen";
+import NotarNotasDisciplinaScreen from "../screens/LancarNotasScreen";
+import LancarNotasDisciplinaScreen from "../screens/LancarNotasScreen";
 
 const Stack = createNativeStackNavigator();
-const Drawer = createDrawerNavigator();
 
-function AppDrawer() {
+export default function AppNavigator({
+  toggleTheme,
+}: {
+  toggleTheme: () => void;
+}) {
   return (
-    <Drawer.Navigator initialRouteName="Home">
-      <Drawer.Screen name="Home" component={HomeScreen} />
-      <Drawer.Screen name="Cadastro de Aluno" component={CadastroAlunoScreen} />
-      <Drawer.Screen name="Cadastro de Disciplina" component={CadastroDisciplinaScreen} />
-      <Drawer.Screen name="Boletim" component={BoletimScreen} />
-    </Drawer.Navigator>
-  );
-}
-
-export default function AppNavigator() {
-  const { token } = useContext(AuthContext);
-
-  return (
-    <Stack.Navigator screenOptions={{ headerShown: false }}>
-      {token ? (
-        <Stack.Screen name="App" component={AppDrawer} />
-      ) : (
-        <Stack.Screen name="Login" component={LoginScreen} />
-      )}
-    </Stack.Navigator>
+    <NavigationContainer>
+      <Stack.Navigator initialRouteName="Login">
+        <Stack.Screen name="Login" options={{ headerShown: false }}>
+          {({ navigation }) => (
+            <LoginScreen navigation={navigation} toggleTheme={toggleTheme} />
+          )}
+        </Stack.Screen>
+        <Stack.Screen
+          name="CadastroScreen"
+          options={{ title: "Cadastro", headerShown: false }}
+        >
+          {({ navigation }) => (
+            <CadastroScreen navigation={navigation} toggleTheme={toggleTheme} />
+          )}
+        </Stack.Screen>
+        <Stack.Screen name="Home" options={{ title: "Início" }}>
+          {({ navigation }) => (
+            <ProtectedRoute navigation={navigation}>
+              <HomeScreen navigation={navigation} toggleTheme={toggleTheme} />
+            </ProtectedRoute>
+          )}
+        </Stack.Screen>
+        <Stack.Screen
+          name="AlunoScreen"
+          options={{ title: "Gerenciar Alunos" }}
+        >
+          {({ navigation }) => (
+            <AlunoScreen navigation={navigation} toggleTheme={toggleTheme} />
+          )}
+        </Stack.Screen>
+        <Stack.Screen
+          name="ProfessorScreen"
+          options={{ title: "Gerenciar Professores" }}
+        >
+          {({ navigation }) => (
+            <ProfessorScreen
+              navigation={navigation}
+              toggleTheme={toggleTheme}
+            />
+          )}
+        </Stack.Screen>
+        <Stack.Screen
+          name="DisciplinaScreen"
+          options={{ title: "Gerenciar Disciplinas" }}
+        >
+          {({ navigation }) => (
+            <DisciplinaScreen
+              navigation={navigation}
+              toggleTheme={toggleTheme}
+            />
+          )}
+        </Stack.Screen>
+        <Stack.Screen
+          name="BoletimScreen"
+          options={{ title: "Boletim Acadêmico" }}
+        >
+          {({ navigation }) => (
+            <BoletimScreen navigation={navigation} toggleTheme={toggleTheme} />
+          )}
+        </Stack.Screen>
+        <Stack.Screen
+          name="ListaAlunos"
+          options={{ title: "Lista de Alunos", headerShown: false }}
+        >
+          {({ navigation }) => <ListaAlunosScreen navigation={navigation} />}
+        </Stack.Screen>
+        <Stack.Screen
+          name="ListaProfessores"
+          options={{ title: "Lista de Professores", headerShown: false }}
+        >
+          {({ navigation }) => (
+            <ListaProfessoresScreen navigation={navigation} />
+          )}
+        </Stack.Screen>
+        <Stack.Screen
+          name="ListaDisciplinas"
+          options={{ title: "Lista de Disciplinas", headerShown: false }}
+        >
+          {({ navigation }) => (
+            <ListaDisciplinasScreen navigation={navigation} />
+          )}
+        </Stack.Screen>
+        <Stack.Screen
+          name="LancarNotasScreen"
+          options={{ title: "Lançar Notas" }}
+        >
+          {({ navigation }) => <LancarNotasScreen navigation={navigation} />}
+        </Stack.Screen>
+        <Stack.Screen
+          name="LancarNotasDisciplinaScreen"
+          options={{ title: "Lançar Notas da Disciplina" }}
+        >
+          {({ navigation }) => (
+            <LancarNotasDisciplinaScreen navigation={navigation} />
+          )}
+        </Stack.Screen>
+      </Stack.Navigator>
+    </NavigationContainer>
   );
 }
