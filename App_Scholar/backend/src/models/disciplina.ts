@@ -18,5 +18,5 @@ export const Disciplina = sequelize.define("Disciplina", {
 });
 
 // Associação: Uma Disciplina pertence a um Professor
-Disciplina.belongsTo(Professor, { foreignKey: "professorId" });
-Professor.hasMany(Disciplina, { foreignKey: "professorId" });
+Disciplina.belongsTo(Professor, { foreignKey: "professorId", as: "Professor" });
+Professor.hasMany(Disciplina, { foreignKey: "professorId", as: "Disciplina" });

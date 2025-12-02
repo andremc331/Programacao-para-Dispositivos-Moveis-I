@@ -57,8 +57,8 @@ export const Nota = sequelize.define<NotaInstance>("Nota", {
 });
 
 // Definindo relacionamentos
-Aluno.hasMany(Nota, { foreignKey: "alunoId", as: "notas" });
-Nota.belongsTo(Aluno, { foreignKey: "alunoId", as: "aluno" });
+Aluno.hasMany(Nota, { foreignKey: "alunoId", as: "Nota" });
+Nota.belongsTo(Aluno, { foreignKey: "alunoId", as: "Aluno" });
 
-Disciplina.hasMany(Nota, { foreignKey: "disciplinaId", as: "notas" });
-Nota.belongsTo(Disciplina, { foreignKey: "disciplinaId", as: "disciplina" });
+Disciplina.hasMany(Nota, { foreignKey: "disciplinaId", as: "Nota" });
+Nota.belongsTo(Disciplina, { foreignKey: "disciplinaId", as: "Disciplina" });

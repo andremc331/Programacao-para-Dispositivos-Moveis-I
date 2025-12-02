@@ -9,57 +9,56 @@ import { NotaInstance } from "../types";
 
 export const consultarBoletim = async (req: Request, res: Response) => {
   const { matricula } = req.params;
-  
+
   try {
-    // Primeiro encontrar o aluno pela matrícula
-    const aluno = await Aluno.findOne({ where: { matricula } }) as AlunoInstance | null;
-    
+    const aluno = await Aluno.findOne({ where: { matricula } });
+
     if (!aluno) {
-      return res.status(404).json({ 
-        message: "Aluno não encontrado" 
-      });
+      return res.status(404).json({ message: "Aluno não encontrado" });
     }
 
-    // Buscar as notas do aluno
     const boletim = await Nota.findAll({
       where: { alunoId: aluno.id },
       include: [
-        { 
-          model: Disciplina, 
+        {
+          model: Disciplina,
+          as: "Disciplina", 
           attributes: ["id", "nome", "cargaHoraria"],
-          include: [{
-            model: Professor,
-            attributes: ["id", "nome", "titulacao"]
-          }]
+          include: [
+            {
+              model: Professor,
+              as: "Professor",   
+              attributes: ["id", "nome", "titulacao"],
+            },
+          ],
         },
-        { 
-          model: Aluno, 
-          attributes: ["id", "nome", "matricula", "curso"] 
+        {
+          model: Aluno,
+          as: "Aluno",
+          attributes: ["id", "nome", "matricula", "curso"],
         },
       ],
-      order: [['createdAt', 'DESC']]
+      order: [["createdAt", "DESC"]],
     });
 
-    if (!boletim || boletim.length === 0) {
-      return res.status(404).json({ 
-        message: "Nenhuma nota encontrada para este aluno" 
-      });
+    if (!boletim.length) {
+      return res.status(404).json({ message: "Nenhuma nota encontrada" });
     }
 
-    res.json({
+    return res.json({
       aluno: {
         id: aluno.id,
         nome: aluno.nome,
         matricula: aluno.matricula,
-        curso: aluno.curso
+        curso: aluno.curso,
       },
-      notas: boletim
+      notas: boletim,
     });
-  } catch (error) {
+  } catch (error: any) {
     console.error("Erro ao consultar boletim:", error);
-    res.status(500).json({ 
-      message: "Erro ao consultar boletim", 
-      error: error instanceof Error ? error.message : error 
+    return res.status(500).json({
+      message: "Erro ao consultar boletim",
+      error: error.message,
     });
   }
 };
